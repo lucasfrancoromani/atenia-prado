@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 620" role="img" aria-label="Mesa 112 con QR">
+  <defs>
+    <linearGradient id="plate" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fffaf0"/>
+      <stop offset=".48" stop-color="#e8e2d6"/>
+      <stop offset="1" stop-color="#c9c1b3"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" x2="1">
+      <stop offset="0" stop-color="#3b2112"/>
+      <stop offset=".55" stop-color="#6a3a1c"/>
+      <stop offset="1" stop-color="#2b160c"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="28" stdDeviation="18" flood-color="#000" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect width="520" height="620" fill="none"/>
+  <ellipse cx="260" cy="568" rx="210" ry="26" fill="#000" opacity=".28"/>
+  <g filter="url(#shadow)">
+    <path d="M77 72h366v420H77z" rx="10" fill="url(#plate)" stroke="#f6f0e5" stroke-width="7"/>
+    <rect x="55" y="487" width="410" height="58" rx="13" fill="url(#wood)"/>
+    <rect x="85" y="545" width="350" height="23" rx="7" fill="#27150d"/>
+  </g>
+  <g fill="#171717">
+    <text x="116" y="151" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="800">Mesa</text>
+    <text x="112" y="229" font-family="Arial Black, Arial, sans-serif" font-size="92" font-weight="900">112</text>
+    <text x="115" y="333" font-family="Arial Black, Arial, sans-serif" font-size="27" font-weight="900">ESCANEA, PIDE Y PAGA</text>
+    <text x="116" y="369" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="800">NOSOTROS TE LO SERVIMOS</text>
+    <text x="121" y="445" font-family="Arial Black, Arial, sans-serif" font-size="30" font-weight="900">MERCADO DEL PRADO</text>
+  </g>
+  <g transform="translate(264 124)" fill="#101010">
+    <rect width="154" height="154" fill="#fff"/>
+    <path d="M9 9h39v39H9zM106 9h39v39h-39zM9 106h39v39H9z"/>
+    <path fill="#fff" d="M19 19h19v19H19zM116 19h19v19h-19zM19 116h19v19H19z"/>
+    <path d="M62 10h12v12H62zM84 10h10v24H84zM61 34h24v10H61zM96 56h13v13H96zM119 60h12v24h-12zM135 58h10v10h-10zM58 59h12v11H58zM77 57h10v30H77zM97 80h34v10H97zM57 96h24v11H57zM90 102h13v27H90zM111 105h10v10h-10zM132 99h13v46h-13zM57 126h20v19H57zM80 136h15v9H80zM106 125h16v20h-16zM22 61h13v14H22zM40 62h11v28H40zM13 82h24v11H13z"/>
+  </g>
+  <g fill="#8a8176">
+    <circle cx="92" cy="83" r="12"/>
+    <circle cx="428" cy="83" r="12"/>
+    <circle cx="92" cy="476" r="12"/>
+    <circle cx="428" cy="476" r="12"/>
+  </g>
+  <g fill="#f5c542">
+    <circle cx="92" cy="83" r="5"/>
+    <circle cx="428" cy="83" r="5"/>
+    <circle cx="92" cy="476" r="5"/>
+    <circle cx="428" cy="476" r="5"/>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Aperol Spritz">
+  <defs>
+    <radialGradient id="bg" cx="39%" cy="18%" r="78%">
+      <stop offset="0" stop-color="#663117"/>
+      <stop offset=".5" stop-color="#171a21"/>
+      <stop offset="1" stop-color="#0b0d11"/>
+    </radialGradient>
+    <linearGradient id="drink" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffb13b"/>
+      <stop offset=".42" stop-color="#ff6d1d"/>
+      <stop offset="1" stop-color="#d72d16"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="34" fill="url(#bg)"/>
+  <ellipse cx="92" cy="143" rx="48" ry="12" fill="#000" opacity=".38"/>
+  <path d="M58 61c4 31 16 51 31 57 15-7 27-28 32-57H58Z" fill="url(#drink)"/>
+  <path d="M56 59c4 34 17 55 33 62 17-8 31-30 34-62H56Z" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="5"/>
+  <path d="M89 119v20M70 141h38" stroke="#fff" stroke-opacity=".38" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="105" cy="62" r="18" fill="#ffbc42"/>
+  <circle cx="105" cy="62" r="11" fill="#ff6b1a"/>
+  <path d="M95 47c7 8 13 17 23 29" stroke="#fff0b4" stroke-width="2" opacity=".45"/>
+  <path d="M76 73c-2 13 2 23 9 32" stroke="#fff2c7" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+  <circle cx="91" cy="80" r="3" fill="#fff2c7" opacity=".5"/>
+  <circle cx="99" cy="94" r="2.5" fill="#fff2c7" opacity=".42"/>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Doble">
+  <defs>
+    <radialGradient id="bg" cx="42%" cy="18%" r="85%">
+      <stop offset="0" stop-color="#5f4318"/>
+      <stop offset=".46" stop-color="#171a21"/>
+      <stop offset="1" stop-color="#0b0d11"/>
+    </radialGradient>
+    <linearGradient id="beer" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffd979"/>
+      <stop offset=".46" stop-color="#c56c13"/>
+      <stop offset="1" stop-color="#713008"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="34" fill="url(#bg)"/>
+  <ellipse cx="91" cy="141" rx="50" ry="12" fill="#000" opacity=".38"/>
+  <path d="M55 42h72l-10 96H65L55 42Z" fill="url(#beer)"/>
+  <path d="M53 40h76l-10 101H63L53 40Z" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="6"/>
+  <path d="M52 37c4-13 22-6 31-9 15-6 22 4 32 6 12 2 18 8 13 18-4 8-16 8-36 8H62c-9 0-14-10-10-23Z" fill="#fff1bf"/>
+  <path d="M76 60c-6 27-2 51 2 70" stroke="#fff4bd" stroke-width="6" stroke-linecap="round" opacity=".48"/>
+  <path d="M108 59c5 24 2 48-2 69" stroke="#5b2606" stroke-width="5" stroke-linecap="round" opacity=".36"/>
+  <circle cx="92" cy="83" r="4" fill="#fff4bd" opacity=".42"/>
+  <circle cx="101" cy="103" r="3" fill="#fff4bd" opacity=".34"/>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Coca-Cola">
+  <defs>
+    <radialGradient id="bg" cx="40%" cy="16%" r="82%">
+      <stop offset="0" stop-color="#4d1114"/>
+      <stop offset=".48" stop-color="#171a21"/>
+      <stop offset="1" stop-color="#0b0d11"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="0" x2="1">
+      <stop offset="0" stop-color="#3d140d"/>
+      <stop offset=".5" stop-color="#170b07"/>
+      <stop offset="1" stop-color="#5b1a12"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="34" fill="url(#bg)"/>
+  <ellipse cx="90" cy="143" rx="42" ry="11" fill="#000" opacity=".38"/>
+  <path d="M67 48h46l-7 91H74L67 48Z" fill="url(#glass)"/>
+  <path d="M65 46h50l-7 95H72L65 46Z" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="5"/>
+  <path d="M68 72h44l-3 32H71l-3-32Z" fill="#cf2027"/>
+  <path d="M75 88c7-9 18 10 30-1" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M79 56c-3 21-1 48 2 72" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".25"/>
+  <circle cx="93" cy="63" r="3" fill="#f6d18a" opacity=".45"/>
+  <circle cx="100" cy="82" r="2" fill="#f6d18a" opacity=".35"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Gin Tonic">
+  <defs>
+    <radialGradient id="bg" cx="44%" cy="18%" r="82%">
+      <stop offset="0" stop-color="#263b48"/>
+      <stop offset=".48" stop-color="#171a21"/>
+      <stop offset="1" stop-color="#0b0d11"/>
+    </radialGradient>
+    <linearGradient id="liquid" x1="0" x2="1">
+      <stop offset="0" stop-color="#e9fbff" stop-opacity=".85"/>
+      <stop offset=".5" stop-color="#99d5e4" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".75"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="34" fill="url(#bg)"/>
+  <ellipse cx="92" cy="143" rx="48" ry="12" fill="#000" opacity=".35"/>
+  <path d="M55 59c4 35 18 57 35 63 18-7 32-29 35-63H55Z" fill="url(#liquid)"/>
+  <path d="M53 57c4 37 19 60 37 68 19-8 34-32 37-68H53Z" fill="none" stroke="#fff" stroke-opacity=".43" stroke-width="5"/>
+  <path d="M90 123v18M70 143h40" stroke="#fff" stroke-opacity=".38" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="78" cy="81" r="10" fill="#eaffff" opacity=".55"/>
+  <circle cx="98" cy="78" r="9" fill="#eaffff" opacity=".5"/>
+  <circle cx="94" cy="98" r="12" fill="#eaffff" opacity=".44"/>
+  <path d="M108 53c12 4 20 13 18 24-13 1-26-7-30-19 4-4 8-5 12-5Z" fill="#8ad85a"/>
+  <path d="M99 58c9 4 15 10 23 18" stroke="#2f6e26" stroke-width="3" opacity=".45"/>
+  <path d="M75 72c-4 12-1 24 7 34" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".36"/>
+</svg>
