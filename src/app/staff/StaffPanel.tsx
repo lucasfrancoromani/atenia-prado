@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image"; // FIX: Importamos el componente de imagen
 import { formatCurrency } from "@/lib/menu";
 
-// --- MOCK DATA ACTUALIZADO (Mesas 01-50) ---
+// --- MOCK DATA ACTUALIZADO (Con imageUrl y mesas corregidas) ---
 type OrderStatus = "NUEVO" | "PREPARANDO" | "LISTO";
 type StaffOrder = {
   id: string;
   tableId: string;
   time: string;
   status: OrderStatus;
-  items: { name: string; qty: number; price: number }[];
+  items: { name: string; qty: number; price: number; imageUrl: string }[];
   total: number;
   tip: number;
   comment?: string;
@@ -19,27 +20,36 @@ type StaffOrder = {
 const initialOrders: StaffOrder[] = [
   {
     id: "3457", tableId: "12", time: "12:45", status: "NUEVO",
-    items: [{ name: "Caña", qty: 2, price: 1.90 }, { name: "Aperol Spritz", qty: 1, price: 6.50 }],
+    items: [
+      { name: "Caña", qty: 2, price: 1.90, imageUrl: "/mock-beer.png" },
+      { name: "Aperol Spritz", qty: 1, price: 6.50, imageUrl: "/aperitivos.png" }
+    ],
     total: 10.30, tip: 0,
   },
   {
     id: "3456", tableId: "05", time: "12:44", status: "NUEVO",
-    items: [{ name: "Doble", qty: 1, price: 3.40 }, { name: "Coca Cola", qty: 1, price: 2.50 }],
+    items: [
+      { name: "Doble", qty: 1, price: 3.40, imageUrl: "/mock-beer.png" },
+      { name: "Coca Cola", qty: 1, price: 2.50, imageUrl: "/mock-beer.png" }
+    ],
     total: 5.90, tip: 0,
   },
   {
     id: "3455", tableId: "08", time: "12:43", status: "PREPARANDO",
-    items: [{ name: "Caña", qty: 2, price: 1.90 }, { name: "Agua", qty: 1, price: 2.00 }],
+    items: [
+      { name: "Caña", qty: 2, price: 1.90, imageUrl: "/mock-beer.png" },
+      { name: "Agua", qty: 1, price: 2.00, imageUrl: "/aperitivos.png" }
+    ],
     total: 5.80, tip: 0,
   },
   {
     id: "3454", tableId: "03", time: "12:41", status: "LISTO",
-    items: [{ name: "Aperol Spritz", qty: 1, price: 6.50 }],
+    items: [{ name: "Aperol Spritz", qty: 1, price: 6.50, imageUrl: "/aperitivos.png" }],
     total: 6.50, tip: 0,
   },
   {
     id: "3453", tableId: "01", time: "12:40", status: "LISTO",
-    items: [{ name: "Cerveza Doble", qty: 1, price: 3.40 }],
+    items: [{ name: "Cerveza Doble", qty: 1, price: 3.40, imageUrl: "/mock-beer.png" }],
     total: 3.40, tip: 0,
   }
 ];
@@ -82,7 +92,6 @@ export function StaffPanel() {
 
   return (
     <>
-      {/* Contenedor principal ensanchado al máximo y centrado */}
       <div className="flex flex-col h-screen bg-[#0f1115] text-white print:hidden font-sans w-full max-w-[1800px] mx-auto relative">
 
         {/* =========================================
@@ -90,7 +99,6 @@ export function StaffPanel() {
             ========================================= */}
         {activeTab === "pedidos" && (
           <div className="flex-1 flex flex-col overflow-hidden fade-in">
-            {/* Header con mucho margen superior (pt-16) */}
             <header className="flex items-center justify-between px-12 pt-16 pb-12">
               <div className="flex items-center gap-6">
                 <button className="text-white/60 hover:text-white transition">
@@ -103,10 +111,8 @@ export function StaffPanel() {
               </div>
             </header>
 
-            {/* Lista de pedidos con gran espaciado */}
             <div className="flex-1 overflow-y-auto px-12 pb-40 space-y-6 no-scrollbar">
               {orders.map((order, index) => {
-                // Lógica visual calcada al mockup para la última comanda
                 const isLatest = index === 0;
 
                 return (
@@ -118,13 +124,11 @@ export function StaffPanel() {
                         : "border-white/5"
                       }`}
                   >
-                    {/* El detalle de la línea superior resaltada en la comanda nueva */}
                     {isLatest && (
                       <div className="absolute -top-[1px] left-8 w-32 h-[3px] bg-accent rounded-b-sm" />
                     )}
 
                     <div className="flex items-center gap-8 flex-1 min-w-0">
-                      {/* Número de mesa Gigante */}
                       <div className={`grid h-24 w-28 place-items-center rounded-2xl font-black text-[2.5rem] shrink-0 transition-colors ${isLatest ? "bg-accent text-black" : "bg-[#22252e] text-white"
                         }`}>
                         {order.tableId}
@@ -135,7 +139,6 @@ export function StaffPanel() {
                       </div>
 
                       <div className="flex items-center gap-4 text-2xl text-white/90 font-medium flex-1 truncate">
-                        {/* Ícono de bebida sutil calcado del mockup */}
                         <div className="opacity-30 mix-blend-luminosity grayscale flex shrink-0">
                           <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10v3H7V2zm2 5h6v13a2 2 0 01-2 2h-2a2 2 0 01-2-2V7z" /></svg>
                         </div>
@@ -162,7 +165,7 @@ export function StaffPanel() {
         )}
 
         {/* =========================================
-            PANTALLA 3: RESUMEN DEL DÍA (Métricas Ampliadas)
+            PANTALLA 3: RESUMEN DEL DÍA
             ========================================= */}
         {activeTab === "historial" && (
           <div className="flex-1 overflow-y-auto px-12 pt-16 pb-40 fade-in">
@@ -240,7 +243,7 @@ export function StaffPanel() {
         )}
 
         {/* =========================================
-            BARRA DE NAVEGACIÓN INFERIOR (Escalada)
+            BARRA DE NAVEGACIÓN INFERIOR
             ========================================= */}
         <nav className="absolute bottom-0 w-full bg-[#0a0c10]/95 backdrop-blur-md border-t border-white/5 flex justify-around items-center h-32 z-40 px-12">
           <button onClick={() => setActiveTab("pedidos")} className={`flex flex-col items-center gap-3 ${activeTab === "pedidos" ? "text-accent" : "text-white/40 hover:text-white/70 transition"}`}>
@@ -292,7 +295,14 @@ export function StaffPanel() {
                 {selectedOrder.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center">
                     <div className="flex items-center gap-6">
-                      <div className="bg-white/5 rounded-2xl w-14 h-16 flex items-center justify-center text-xl">🍺</div>
+                      {/* FIX: Ahora renderiza la imagen del producto (con fallback al emoji si no hay) */}
+                      <div className="relative bg-white/5 rounded-2xl w-14 h-16 flex items-center justify-center shrink-0 border border-white/10 overflow-hidden">
+                        {item.imageUrl ? (
+                          <Image src={item.imageUrl} alt={item.name} fill sizes="56px" className="object-cover" />
+                        ) : (
+                          <span className="text-xl">🍺</span>
+                        )}
+                      </div>
                       <span className="font-semibold text-white/90 text-2xl">
                         <span className="text-accent font-black mr-3">{item.qty}x</span> {item.name}
                       </span>
