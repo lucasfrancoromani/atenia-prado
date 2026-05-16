@@ -18,13 +18,14 @@ export default function Home() {
         />
       </div>
 
-      {/* Botón Central de DEMO */}
-      <Link
-        href="/mesa/112"
-        className="group relative inline-flex items-center justify-center rounded-full bg-accent px-16 py-6 text-2xl font-black tracking-widest text-black shadow-[0_0_60px_rgba(245,197,66,0.25)] transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-[0_0_80px_rgba(255,255,255,0.4)]"
+      {/* FIX: Se restringe el hover a desktop (md:) y se agrega active:scale para feedback táctil en móvil */}
+      {/* Usamos <a> nativo en lugar de <Link> para forzar la navegación dura */}
+      <a
+        href="/mesa/12"
+        className="group relative inline-flex items-center justify-center rounded-full bg-accent px-16 py-6 text-2xl font-black tracking-widest text-black shadow-[0_0_60px_rgba(245,197,66,0.25)] transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-[0_0_80px_rgba(255,255,255,0.4)] active:scale-95"
       >
         DEMO
-      </Link>
+      </a>
 
       {/* Atajo discreto al panel de staff */}
       <div className="absolute bottom-10">

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Order } from "@/types/order";
-import { formatCurrency } from "@/lib/menu";
 
 type OrderConfirmationProps = {
   order: Order;
@@ -9,49 +8,63 @@ type OrderConfirmationProps = {
 
 export function OrderConfirmation({ order, onReset }: OrderConfirmationProps) {
   return (
-    <section className="mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-md flex-col justify-center px-5 py-10">
-      <div className="premium-panel rounded-[2rem] p-7 text-center">
-        <div className="mx-auto grid size-20 place-items-center rounded-full bg-success text-4xl font-bold text-white shadow-[0_20px_60px_rgba(34,197,94,0.22)]">
-          ✓
+    <div className="fixed inset-0 z-50 flex items-end bg-black/60 backdrop-blur-md fade-in">
+
+      <section className="premium-panel relative z-10 w-full max-h-[90vh] overflow-y-auto rounded-t-[2.5rem] p-6 pb-10 animate-slide-up text-center">
+        <div className="mx-auto mb-8 h-1.5 w-12 rounded-full bg-white/20" />
+
+        {/* Ícono de Éxito Premium */}
+        <div className="mx-auto mb-6 grid size-24 place-items-center rounded-full bg-success/10 border border-success/20 text-success shadow-[0_0_60px_rgba(34,197,94,0.15)]">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5"></path>
+          </svg>
         </div>
-        <p className="mt-7 text-xs font-bold uppercase tracking-[0.24em] text-accent">
-          Pedido confirmado
+
+        <p className="text-xs font-black uppercase tracking-[0.24em] text-accent mb-2">
+          ¡Pedido confirmado!
         </p>
-        <h1 className="mt-3 text-3xl font-semibold">Mesa {order.tableId}</h1>
-        <div className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-5">
-          <p className="text-sm text-muted">Número de pedido</p>
-          <p className="mt-2 font-mono text-3xl font-bold text-white">
-            {order.orderNumber}
-          </p>
-          <div className="my-5 h-px bg-white/10" />
-          <p className="text-sm text-muted">Tiempo estimado</p>
-          <p className="mt-1 text-2xl font-semibold">
-            {order.estimatedMinutes}-{order.estimatedMinutes + 4} min
-          </p>
-          <p className="mt-4 font-mono text-sm text-accent">
-            {formatCurrency(order.total)} pagado
-          </p>
+        <h1 className="text-3xl font-black text-white tracking-tight mb-8">
+          Mesa {order.tableId}
+        </h1>
+
+        {/* Tarjeta de Resumen */}
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-6 text-left">
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm font-semibold text-muted">Número de pedido</span>
+            <span className="font-mono text-xl font-bold text-white">{order.orderNumber}</span>
+          </div>
+          <div className="h-px bg-white/5 w-full my-4" />
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-semibold text-muted">Tiempo estimado</span>
+            <span className="font-mono text-lg font-bold text-white">
+              {order.estimatedMinutes} - {order.estimatedMinutes + 4} min
+            </span>
+          </div>
         </div>
-        <p className="mt-5 text-sm leading-6 text-muted">
-          Te avisaremos en barra cuando esté listo. Puedes seguir pidiendo
-          desde esta mesa.
+
+        {/* COPY ACTUALIZADO: Enfoque en el servicio de mesa */}
+        <p className="text-sm leading-relaxed text-white/70 mb-8 px-2">
+          Relájate y disfruta. Nuestros camareros te llevarán el pedido a la mesa enseguida.
         </p>
-        <div className="mt-7 grid gap-3">
-          <button
-            type="button"
-            onClick={onReset}
-            className="min-h-13 rounded-2xl bg-accent px-5 font-bold text-black"
-          >
-            Seguir pidiendo
-          </button>
-          <Link
-            href="/staff"
-            className="inline-flex min-h-13 items-center justify-center rounded-2xl border border-white/10 px-5 font-semibold text-white/80"
-          >
-            Ver en staff
-          </Link>
-        </div>
-      </div>
-    </section>
+
+        {/* Botón Principal */}
+        <button
+          type="button"
+          onClick={onReset}
+          className="w-full flex items-center justify-center min-h-[3.5rem] rounded-[1.25rem] bg-accent text-black text-lg font-bold transition active:scale-[0.98] shadow-[0_15px_40px_rgba(245,197,66,0.15)] mb-4"
+        >
+          Seguir pidiendo
+        </button>
+
+        {/* Atajo para la demostración (para que pases directo al panel de staff) */}
+        <Link
+          href="/staff"
+          className="inline-flex items-center justify-center min-h-[3.5rem] rounded-[1.25rem] border border-white/10 w-full text-white/60 font-semibold transition active:scale-[0.98] hover:bg-white/[0.02]"
+        >
+          Ver comanda en panel staff
+        </Link>
+      </section>
+
+    </div>
   );
 }

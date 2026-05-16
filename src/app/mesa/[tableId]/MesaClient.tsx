@@ -88,18 +88,6 @@ export function MesaClient({ tableId }: MesaClientProps) {
     setStep("confirmation");
   }
 
-  if (step === "confirmation" && createdOrder) {
-    return (
-      <OrderConfirmation
-        order={createdOrder}
-        onReset={() => {
-          setCreatedOrder(null);
-          setStep("menu");
-          setViewState("home");
-        }}
-      />
-    );
-  }
 
   return (
     <section className="mx-auto w-full max-w-md bg-[#0f1115] min-h-screen px-4 pb-28 pt-4 text-white font-sans antialiased">
@@ -355,6 +343,18 @@ export function MesaClient({ tableId }: MesaClientProps) {
 
           </section>
         </div>
+      )}
+
+      {/* CAJÓN 3: CONFIRMACIÓN (Pantalla 5 rediseñada) */}
+      {step === "confirmation" && createdOrder && (
+        <OrderConfirmation
+          order={createdOrder}
+          onReset={() => {
+            setCreatedOrder(null);
+            setStep("menu");
+            setViewState("home");
+          }}
+        />
       )}
 
     </section>
