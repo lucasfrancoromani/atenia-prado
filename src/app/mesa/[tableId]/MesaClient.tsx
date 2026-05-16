@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+// Añadimos useEffect para escuchar los gestos de iOS
+import { useMemo, useState, useEffect } from "react";
 import { CartDrawer } from "@/components/CartDrawer";
 import { OrderConfirmation } from "@/components/OrderConfirmation";
 import { ProductCard } from "@/components/ProductCard";
 import { formatCurrency, menuCategories, menuProducts } from "@/lib/menu";
 import { createOrder } from "@/lib/orders";
-import type { CartItem, Order } from "@/types/order";
+import type { CartItem, Order, Product } from "@/types/order";
 
 type MesaClientProps = {
   tableId: string;
@@ -22,6 +23,33 @@ export function MesaClient({ tableId }: MesaClientProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [step, setStep] = useState<Step>("menu");
   const [createdOrder, setCreatedOrder] = useState<Order | null>(null);
+
+  // --- LÓGICA DE NAVEGACIÓN NATIVA (SWIPE BACK iOS) ---
+  useEffect(() => {
+    const handlePopState = () => {
+      // Si el usuario hace el gesto de "deslizar atrás" en su móvil, lo devolvemos al Home
+      setViewState("home");
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const openCategory = (category: Product["category"]) => {
+    setActiveCategory(category);
+    setViewState("category");
+    // Inyectamos un paso en el historial del móvil para habilitar el gesto "Atrás"
+    window.history.pushState({ view: "category" }, "");
+  };
+
+  const closeCategory = () => {
+    // Si toca el botón de la flecha <-, usamos la API nativa para limpiar el historial y disparar el popstate
+    if (window.history.state?.view === "category") {
+      window.history.back();
+    } else {
+      setViewState("home");
+    }
+  };
+  // -----------------------------------------------------
 
   const cartItems = useMemo<CartItem[]>(() => {
     return menuProducts
@@ -113,7 +141,7 @@ export function MesaClient({ tableId }: MesaClientProps) {
 
       {/* PANTALLA 1: HOME DE LA MESA */}
       {viewState === "home" && (
-        <div>
+        <div className="fade-in">
 
           <div className="flex items-start justify-between pt-8 pb-2">
             <h1 className="text-3xl font-black tracking-tight text-white uppercase leading-[0.95] flex flex-col">
@@ -135,40 +163,40 @@ export function MesaClient({ tableId }: MesaClientProps) {
 
           <div className="mt-8 space-y-4">
 
-            {/* Tarjeta BEBIDAS - 100% Nativa y A Prueba de iOS */}
-            <div
-              role="button"
-              tabIndex={0}
-              onPointerDown={() => {
-                setActiveCategory("Cervezas");
-                setViewState("category");
-              }}
-              onClick={() => {
-                // Fallback por si onPointerDown no dispara en algún navegador muy antiguo
-                setActiveCategory("Cervezas");
-                setViewState("category");
-              }}
-              className="relative w-full h-40 rounded-[1.5rem] overflow-hidden border border-white/5 bg-neutral-900 cursor-pointer select-none touch-manipulation"
+            {/* Tarjeta BEBIDAS (Con la animación de hundimiento restaurada) */}
+            <button
+              type="button"
+              onClick={() => openCategory("Cervezas")}
+              className="group relative w-full h-40 rounded-[1.5rem] overflow-hidden border border-white/5 text-left transition-transform duration-300 active:scale-[0.97] select-none touch-manipulation"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <img
+              <Image
                 src="/mock-beer.png"
                 alt="Bebidas"
-                className="absolute inset-0 w-full h-full object-cover brightness-[0.4] pointer-events-none"
+                fill
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="object-cover brightness-[0.4] transition-transform duration-700 md:group-hover:scale-105 pointer-events-none"
+                priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
               <div className="absolute bottom-5 left-5 pointer-events-none">
                 <span className="block text-xs font-black uppercase tracking-[0.25em] text-accent">Sección</span>
                 <span className="block text-2xl font-black tracking-wide text-white mt-0.5">BEBIDAS</span>
               </div>
-            </div>
+            </button>
 
             {/* Tarjeta APERITIVOS */}
-            <div className="relative w-full h-40 rounded-[1.5rem] overflow-hidden border border-white/5 opacity-60 select-none">
-              <img
+            <button
+              type="button"
+              disabled
+              className="relative w-full h-40 rounded-[1.5rem] overflow-hidden border border-white/5 opacity-60 text-left select-none"
+            >
+              <Image
                 src="/aperitivos.png"
                 alt="Aperitivos"
-                className="absolute inset-0 w-full h-full object-cover brightness-[0.25] pointer-events-none"
+                fill
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="object-cover brightness-[0.25] pointer-events-none"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
               <div className="absolute bottom-5 left-5 pointer-events-none">
@@ -178,7 +206,7 @@ export function MesaClient({ tableId }: MesaClientProps) {
               <div className="absolute top-4 right-4 bg-black/60 border border-white/10 px-2 py-0.5 rounded text-[10px] text-accent uppercase font-black tracking-widest pointer-events-none">
                 Próximamente
               </div>
-            </div>
+            </button>
 
           </div>
 
@@ -186,7 +214,7 @@ export function MesaClient({ tableId }: MesaClientProps) {
             <button
               type="button"
               onClick={() => totalCount > 0 && setDrawerOpen(true)}
-              className="flex min-h-14 w-full items-center justify-between rounded-full border border-white/10 bg-[#1a1c23]/95 px-6 font-bold text-white/90 shadow-2xl transition active:scale-95"
+              className="flex min-h-14 w-full items-center justify-between rounded-full border border-white/10 bg-[#1a1c23]/95 px-6 font-bold text-white/90 shadow-[0_0_40px_rgba(0,0,0,0.8)] backdrop-blur transition active:scale-95"
             >
               <div className="flex items-center gap-2">
                 <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-accent">
@@ -202,23 +230,22 @@ export function MesaClient({ tableId }: MesaClientProps) {
 
       {/* PANTALLA 2: LISTADO DE PRODUCTOS */}
       {viewState === "category" && (
-        <div>
+        <div className="fade-in">
           <div className="flex items-center justify-between pt-2">
-            <div
-              role="button"
-              tabIndex={0}
-              onPointerDown={() => setViewState("home")}
-              onClick={() => setViewState("home")}
-              className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-white/80 cursor-pointer touch-manipulation p-2 -ml-2"
+            <button
+              type="button"
+              onClick={closeCategory}
+              className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-white/80 active:text-accent touch-manipulation p-2 -ml-2 transition-colors"
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <span className="text-accent text-lg leading-none">←</span> BEBIDAS
-            </div>
+            </button>
 
             <button
               type="button"
               onClick={() => totalCount > 0 && setDrawerOpen(true)}
-              className="relative p-2 text-white/80 touch-manipulation"
+              className="relative p-2 text-white/80 touch-manipulation transition-transform active:scale-90"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               🛒
               {totalCount > 0 && (
@@ -229,16 +256,17 @@ export function MesaClient({ tableId }: MesaClientProps) {
             </button>
           </div>
 
-          <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
+          <div className="mt-6 flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             {menuCategories.map((category) => (
               <button
                 key={category}
                 type="button"
                 onClick={() => setActiveCategory(category)}
-                className={`shrink-0 rounded-full px-5 py-2 text-xs font-black tracking-wider uppercase transition-all touch-manipulation ${activeCategory === category
+                className={`shrink-0 rounded-full px-5 py-2 text-xs font-black tracking-wider uppercase transition-all touch-manipulation active:scale-95 ${activeCategory === category
                     ? "bg-accent text-black shadow-lg shadow-accent/10"
                     : "bg-[#181b22] border border-white/5 text-white/60"
                   }`}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 {category === "Cafes" ? "Cafés" : category}
               </button>
@@ -260,7 +288,7 @@ export function MesaClient({ tableId }: MesaClientProps) {
           <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-md p-4">
             <button
               type="button"
-              onClick={() => totalCount > 0 ? setDrawerOpen(true) : setViewState("home")}
+              onClick={() => totalCount > 0 ? setDrawerOpen(true) : closeCategory()}
               className={`flex min-h-14 w-full items-center justify-between rounded-full px-6 font-black tracking-wide text-black shadow-[0_15px_40px_rgba(245,197,66,0.2)] transition active:scale-95 ${totalCount > 0 ? "bg-accent" : "bg-accent/40 opacity-60 cursor-not-allowed"
                 }`}
               disabled={totalCount === 0}
