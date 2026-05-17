@@ -320,10 +320,9 @@ export function MesaClient({ tableId }: MesaClientProps) {
         onClose={() => setDrawerOpen(false)}
         onAdd={addProduct}
         onRemove={removeProduct}
-        onCheckout={(tipAmount) => {
+        onCheckout={(tipAmount, commentText) => {
           setTip(tipAmount);
-          // Opcional: Si agregas la captura de comentarios en el drawer, pásala aquí. 
-          // Por ahora guardamos el tip y avanzamos.
+          setOrderComment(commentText); // <-- ACÁ atrapamos el comentario del carrito y lo guardamos en el estado general
           setDrawerOpen(false);
           setStep("payment");
         }}
@@ -351,18 +350,6 @@ export function MesaClient({ tableId }: MesaClientProps) {
               <p className="text-[3.25rem] font-black text-white tracking-tighter leading-none">
                 {formatCurrency(total + tip)}
               </p>
-            </div>
-
-            {/* Input de Comentarios integrado opcionalmente en la vista de pago si se desea refinar antes de pagar */}
-            <div className="mb-6">
-              <input
-                type="text"
-                value={orderComment}
-                onChange={(e) => setOrderComment(e.target.value)}
-                placeholder="¿Alguna aclaración de último momento para la barra?"
-                className="w-full rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-accent transition"
-                disabled={isSubmitting}
-              />
             </div>
 
             {/* Botones con control de envío (disabled={isSubmitting}) */}

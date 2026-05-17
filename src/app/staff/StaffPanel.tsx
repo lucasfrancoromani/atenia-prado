@@ -67,12 +67,11 @@ export function StaffPanel() {
           };
 
           // Intento de reproducir sonido (funcionará si el usuario ya hizo clic en la página)
-          try {
-            const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-            audio.play();
-          } catch (e) {
-            console.log("Audio bloqueado por navegador. Requiere interacción previa.");
-          }
+          // Reproducir sonido manejando la promesa del Autoplay
+          const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+          audio.play().catch((error) => {
+            console.warn("🔔 Sonido silenciado: El camarero debe hacer al menos un clic en la pantalla para activar las alertas sonoras.");
+          });
 
           setOrders((currentOrders) => [incomingOrder, ...currentOrders]);
         }
@@ -146,33 +145,34 @@ export function StaffPanel() {
 
             <div className="flex-1 overflow-y-auto px-4 md:px-12 pb-32 md:pb-40 space-y-4 md:space-y-6 no-scrollbar">
               {orders.map((order, index) => {
-                const isLatest = index === 0;
+                // Ahora la alerta visual se aplica a CUALQUIER pedido que esté "NUEVO"
+                const isNewAlert = order.status === "NUEVO";
 
                 return (
                   <div
                     key={order.id}
                     onClick={() => setSelectedOrder(order)}
-                    // Aquí aplicamos la clase animate-alert-glow si es la comanda nueva
-                    className={`relative flex flex-col md:flex-row md:items-center justify-between bg-[#181b22] rounded-2xl md:rounded-3xl p-4 md:p-6 cursor-pointer transition active:scale-[0.99] hover:bg-[#1c2028] border gap-4 md:gap-0 ${isLatest
-                        ? "animate-alert-glow animate-in fade-in slide-in-from-top-4"
-                        : "border-white/5"
+                    className={`relative flex flex-col md:flex-row md:items-center justify-between bg-[#181b22] rounded-2xl md:rounded-3xl p-4 md:p-6 cursor-pointer transition active:scale-[0.99] hover:bg-[#1c2028] border gap-4 md:gap-0 ${isNewAlert
+                      ? "animate-alert-glow animate-in fade-in slide-in-from-top-4"
+                      : "border-white/5"
                       }`}
                   >
-                    {/* El detalle de la línea superior resaltada */}
-                    {isLatest && (
+                    {/* Detalle de la línea superior resaltada */}
+                    {isNewAlert && (
                       <div className="absolute -top-[1px] left-6 md:left-8 w-16 md:w-32 h-[2px] md:h-[3px] bg-accent rounded-b-sm" />
                     )}
 
                     {/* BALIZA LUMINOSA RADAR (Ping) */}
-                    {isLatest && (
-                      <span className="absolute -top-2 -right-2 md:-top-3 md:-right-3 flex h-6 w-6 md:h-8 md:w-8">
+                    {/* Ubicación interna segura y tamaño optimizado para evitar cortes en los bordes */}
+                    {isNewAlert && (
+                      <span className="absolute top-2 right-2 md:top-3 md:right-3 flex h-4 w-4 md:h-5 md:w-5 z-10">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-6 w-6 md:h-8 md:w-8 bg-accent border-4 border-[#0f1115]"></span>
+                        <span className="relative inline-flex rounded-full h-4 w-4 md:h-5 md:w-5 bg-accent border-2 border-[#181b22]"></span>
                       </span>
                     )}
 
                     <div className="flex items-center gap-4 md:gap-8 flex-1 min-w-0">
-                      <div className={`grid h-16 w-20 md:h-24 md:w-28 place-items-center rounded-xl md:rounded-2xl font-black text-2xl md:text-[2.5rem] shrink-0 transition-colors ${isLatest ? "bg-accent text-black" : "bg-[#22252e] text-white"
+                      <div className={`grid h-16 w-20 md:h-24 md:w-28 place-items-center rounded-xl md:rounded-2xl font-black text-2xl md:text-[2.5rem] shrink-0 transition-colors ${isNewAlert ? "bg-accent text-black" : "bg-[#22252e] text-white"
                         }`}>
                         {order.tableId}
                       </div>
@@ -181,13 +181,21 @@ export function StaffPanel() {
                         #{order.id}
                       </div>
 
-                      <div className="flex items-center gap-3 md:gap-4 text-base md:text-2xl text-white/90 font-medium flex-1 truncate">
+                      <div className="flex items-center gap-3 md:gap-4 text-base md:text-2xl text-white/90 font-medium flex-1 min-w-0">
                         <div className="opacity-30 mix-blend-luminosity grayscale hidden md:flex shrink-0">
                           <svg className="w-5 h-5 md:w-7 md:h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10v3H7V2zm2 5h6v13a2 2 0 01-2 2h-2a2 2 0 01-2-2V7z" /></svg>
                         </div>
                         <span className="truncate">
                           {order.items.map(i => `${i.qty}x ${i.name}`).join(", ")}
                         </span>
+
+                        {/* Indicador visual de nota/comentario */}
+                        {order.comment && (
+                          <span className="ml-3 shrink-0 inline-flex items-center gap-1.5 bg-accent/10 border border-accent/30 text-accent text-xs md:text-base px-2.5 py-1 rounded-xl font-black uppercase tracking-wider animate-pulse">
+                            <span>📝</span>
+                            <span className="hidden sm:inline">Nota</span>
+                          </span>
+                        )}
                       </div>
                     </div>
 

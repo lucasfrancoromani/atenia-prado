@@ -13,7 +13,7 @@ type CartDrawerProps = {
   onClose: () => void;
   onAdd: (productId: string) => void;
   onRemove: (productId: string) => void;
-  onCheckout: (tipAmount: number) => void; // FIX: Ahora enviamos la propina al padre
+  onCheckout: (tipAmount: number, comment: string) => void;
 };
 
 type TipType = "10" | "round" | "custom" | null;
@@ -119,7 +119,7 @@ export function CartDrawer({
           <input type="text" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="¿Algún comentario? Ej: limón aparte..." className="w-full rounded-2xl border border-white/8 bg-white/[0.035] px-4 py-4 text-sm text-white placeholder:text-white/40 transition-colors focus:border-accent focus:bg-white/[0.05] outline-none" />
         </div>
 
-        <button type="button" onClick={() => onCheckout(currentTip)} className="mt-6 min-h-14 w-full rounded-2xl bg-accent text-base font-bold text-black shadow-[0_18px_42px_rgba(245,197,66,0.18)] transition hover:brightness-110 active:scale-[0.98]">
+        <button type="button" onClick={() => onCheckout(currentTip, comment)} className="mt-6 min-h-14 w-full rounded-2xl bg-accent text-base font-bold text-black shadow-[0_18px_42px_rgba(245,197,66,0.18)] transition hover:brightness-110 active:scale-[0.98]">
           Continuar al pago
         </button>
       </section>
