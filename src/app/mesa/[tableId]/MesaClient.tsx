@@ -82,19 +82,30 @@ export function MesaClient({ tableId }: MesaClientProps) {
   // --- FUNCIÓN DE PAGO REAL CON SUPABASE ---
   async function confirmPayment() {
     if (!cartItems.length || isSubmitting) return;
+    setIsSubmitting(true);
 
-    // Desbloqueo de audio en el evento click estricto
+    // 1. DESBLOQUEO CRÍTICO MÓVIL: Reproducimos el audio inmediatamente, sin esperas
     const successAudio = document.getElementById("success-audio") as HTMLAudioElement;
+    let audioUnlocked = false;
+
     if (successAudio) {
-      successAudio.volume = 0; // silenciado
-      successAudio.play().then(() => {
-        successAudio.pause();
-        successAudio.currentTime = 0;
-        successAudio.volume = 1; // restauramos
-      }).catch(e => console.log("Unlock failed", e));
+      // Intentamos reproducir el sonido real de fondo (volumen bajo o normal) apenas toca el botón
+      successAudio.volume = 1; // Asegurar volumen
+      successAudio.currentTime = 0;
+
+      const playPromise = successAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          // Si el audio se reprodujo bien, lo pausamos al instante para guardarlo para después del pago
+          successAudio.pause();
+          successAudio.currentTime = 0;
+          audioUnlocked = true; // El contexto de audio de Safari ya está activado
+        }).catch(error => {
+          console.warn("Autoplay bloqueado en el primer intento", error);
+        });
+      }
     }
 
-    setIsSubmitting(true);
     const finalTotal = total + tip;
 
     // Estructuramos los productos de forma simple para guardarlos en el campo JSONB
@@ -119,7 +130,7 @@ export function MesaClient({ tableId }: MesaClientProps) {
           status: "NUEVO"
         }
       ])
-      .select(); // El .select() es clave para que nos devuelva el registro creado con su ID y número serial
+      .select();
 
     if (error) {
       console.error("Error crítico al enviar el pedido a Supabase:", error.message);
@@ -130,7 +141,6 @@ export function MesaClient({ tableId }: MesaClientProps) {
 
     const databaseOrder = data[0];
 
-    // Mapeamos cartItems a OrderItem[]
     const orderItems = cartItems.map((item) => ({
       productId: item.product.id,
       name: item.product.name,
@@ -139,11 +149,9 @@ export function MesaClient({ tableId }: MesaClientProps) {
       quantity: item.quantity,
     }));
 
-    // Mapeamos los datos reales devueltos por Supabase al formato que lee tu pantalla de éxito
     setCreatedOrder({
       id: databaseOrder.id,
       tableId: databaseOrder.table_id,
-      // Formateamos el número serial autoincremental (ej: de 7 a "0007") para que luzca súper pro
       orderNumber: String(databaseOrder.order_number).padStart(4, "0"),
       estimatedMinutes: 8,
       items: orderItems,
@@ -153,13 +161,14 @@ export function MesaClient({ tableId }: MesaClientProps) {
       createdAt: new Date().toISOString(),
     });
 
-    // Reproducir el sonido de éxito al finalizar la transacción
-    if (successAudio) {
+    // 2. REPRODUCCIÓN FINAL DE ÉXITO: 
+    // Como lo desbloqueamos antes del await, Safari ahora nos dejará reproducirlo
+    if (successAudio && audioUnlocked) {
       successAudio.currentTime = 0;
-      successAudio.play().catch(e => console.warn("Success audio blocked", e));
+      successAudio.play().catch(e => console.warn("Audio final bloqueado", e));
     }
 
-    // Limpieza de estados locales tras la compra exitosa
+    // Limpieza de estados
     setCart({});
     setTip(0);
     setOrderComment("");
@@ -171,7 +180,7 @@ export function MesaClient({ tableId }: MesaClientProps) {
   return (
     <section className="mx-auto w-full max-w-md bg-[#0f1115] min-h-screen px-4 pb-28 pt-4 text-white font-sans antialiased">
       {/* Audio oculto para notificaciones de cliente */}
-      <audio id="success-audio" src="https://actions.google.com/sounds/v1/household/microwave_bell_ding.ogg" preload="auto" />
+      <audio id="success-audio" src="/sounds/exito.mp3" preload="auto" />
 
       {/* PANTALLA 1: HOME DE LA MESA */}
       {viewState === "home" && (

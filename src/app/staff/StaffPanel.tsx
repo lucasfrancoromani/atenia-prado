@@ -42,7 +42,7 @@ export function StaffPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("pedidos");
   const [orders, setOrders] = useState<StaffOrder[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<StaffOrder | null>(null);
-  
+
   // Estado para el botón visual de "Alertas On"
   const [soundUnlocked, setSoundUnlocked] = useState(false);
 
@@ -131,7 +131,7 @@ export function StaffPanel() {
 
   return (
     <>
-      <audio id="alert-audio" src="https://actions.google.com/sounds/v1/alarms/dinner_bell_triangle.ogg" preload="auto" />
+      <audio id="alert-audio" src="/sounds/campana.mp3" preload="auto" />
 
       {/* Estilos inyectados para el resplandor de alerta visual */}
       <style dangerouslySetInnerHTML={{
@@ -157,7 +157,7 @@ export function StaffPanel() {
                 </button>
                 <h1 className="text-base md:text-2xl font-black tracking-[0.2em] uppercase text-white/90">Pedidos en curso</h1>
               </div>
-              
+
               <div className="flex items-center gap-4">
                 <div className="text-xs md:text-lg font-semibold text-white/50 flex items-center gap-2 md:gap-3 border border-white/10 rounded-xl px-4 py-2 md:py-3 cursor-pointer hover:bg-white/5 transition">
                   Todos <span className="text-[10px] md:text-sm">▼</span>
@@ -315,28 +315,28 @@ export function StaffPanel() {
 
         {activeTab === "ajustes" && (
           <div className="flex-1 p-6 md:p-12 overflow-y-auto fade-in">
-             <h1 className="text-base md:text-2xl font-black tracking-[0.2em] uppercase text-white/90 mb-6 md:mb-12">Ajustes del Sistema</h1>
-             
-             <div className="bg-[#181b22] border border-white/5 rounded-2xl p-6 md:p-10 max-w-2xl">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="grid size-12 place-items-center rounded-xl bg-accent/10 text-accent">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                  </div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white">Alertas Sonoras</h2>
+            <h1 className="text-base md:text-2xl font-black tracking-[0.2em] uppercase text-white/90 mb-6 md:mb-12">Ajustes del Sistema</h1>
+
+            <div className="bg-[#181b22] border border-white/5 rounded-2xl p-6 md:p-10 max-w-2xl">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="grid size-12 place-items-center rounded-xl bg-accent/10 text-accent">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                 </div>
-                
-                <p className="text-sm md:text-base text-white/60 mb-8 leading-relaxed">
-                  Debido a las políticas de seguridad de los navegadores (como Safari o Chrome), las alertas de sonido para los nuevos pedidos no pueden sonar automáticamente hasta que el usuario (tú) dé permiso interactuando explícitamente con la aplicación al menos una vez.
-                </p>
-                
-                <button
-                  onClick={unlockAudio}
-                  className={`w-full md:w-auto flex justify-center items-center gap-3 px-8 py-4 rounded-xl border text-base font-bold transition active:scale-[0.98] ${soundUnlocked ? 'bg-success/10 border-success/30 text-success' : 'bg-accent border-accent text-black hover:brightness-110 shadow-[0_10px_30px_rgba(245,197,66,0.15)]'}`}
-                >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                  {soundUnlocked ? 'Alertas Activadas Correctamente' : 'Activar Alertas de Audio'}
-                </button>
-             </div>
+                <h2 className="text-xl md:text-2xl font-bold text-white">Alertas Sonoras</h2>
+              </div>
+
+              <p className="text-sm md:text-base text-white/60 mb-8 leading-relaxed">
+                Debido a las políticas de seguridad de los navegadores (como Safari o Chrome), las alertas de sonido para los nuevos pedidos no pueden sonar automáticamente hasta que el usuario (tú) dé permiso interactuando explícitamente con la aplicación al menos una vez.
+              </p>
+
+              <button
+                onClick={unlockAudio}
+                className={`w-full md:w-auto flex justify-center items-center gap-3 px-8 py-4 rounded-xl border text-base font-bold transition active:scale-[0.98] ${soundUnlocked ? 'bg-success/10 border-success/30 text-success' : 'bg-accent border-accent text-black hover:brightness-110 shadow-[0_10px_30px_rgba(245,197,66,0.15)]'}`}
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                {soundUnlocked ? 'Alertas Activadas Correctamente' : 'Activar Alertas de Audio'}
+              </button>
+            </div>
           </div>
         )}
 
