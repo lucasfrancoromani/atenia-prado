@@ -83,6 +83,17 @@ export function MesaClient({ tableId }: MesaClientProps) {
   async function confirmPayment() {
     if (!cartItems.length || isSubmitting) return;
 
+    // Desbloqueo de audio en el evento click estricto
+    const successAudio = document.getElementById("success-audio") as HTMLAudioElement;
+    if (successAudio) {
+      successAudio.volume = 0; // silenciado
+      successAudio.play().then(() => {
+        successAudio.pause();
+        successAudio.currentTime = 0;
+        successAudio.volume = 1; // restauramos
+      }).catch(e => console.log("Unlock failed", e));
+    }
+
     setIsSubmitting(true);
     const finalTotal = total + tip;
 
@@ -142,6 +153,12 @@ export function MesaClient({ tableId }: MesaClientProps) {
       createdAt: new Date().toISOString(),
     });
 
+    // Reproducir el sonido de éxito al finalizar la transacción
+    if (successAudio) {
+      successAudio.currentTime = 0;
+      successAudio.play().catch(e => console.warn("Success audio blocked", e));
+    }
+
     // Limpieza de estados locales tras la compra exitosa
     setCart({});
     setTip(0);
@@ -153,6 +170,8 @@ export function MesaClient({ tableId }: MesaClientProps) {
 
   return (
     <section className="mx-auto w-full max-w-md bg-[#0f1115] min-h-screen px-4 pb-28 pt-4 text-white font-sans antialiased">
+      {/* Audio oculto para notificaciones de cliente */}
+      <audio id="success-audio" src="https://actions.google.com/sounds/v1/household/microwave_bell_ding.ogg" preload="auto" />
 
       {/* PANTALLA 1: HOME DE LA MESA */}
       {viewState === "home" && (

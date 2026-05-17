@@ -131,7 +131,7 @@ export function StaffPanel() {
 
   return (
     <>
-      <audio id="alert-audio" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto" />
+      <audio id="alert-audio" src="https://actions.google.com/sounds/v1/alarms/dinner_bell_triangle.ogg" preload="auto" />
 
       {/* Estilos inyectados para el resplandor de alerta visual */}
       <style dangerouslySetInnerHTML={{
