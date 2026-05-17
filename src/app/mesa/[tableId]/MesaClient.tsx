@@ -180,7 +180,7 @@ export function MesaClient({ tableId }: MesaClientProps) {
   return (
     <section className="mx-auto w-full max-w-md bg-[#0f1115] min-h-screen px-4 pb-28 pt-4 text-white font-sans antialiased">
       {/* Audio oculto para notificaciones de cliente */}
-      <audio id="success-audio" src="/sounds/exito.mp3" preload="auto" />
+      <audio id="success-audio" src="/sounds/exito.wav" preload="auto" />
 
       {/* PANTALLA 1: HOME DE LA MESA */}
       {viewState === "home" && (
