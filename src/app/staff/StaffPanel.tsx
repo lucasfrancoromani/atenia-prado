@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/menu";
+import { supabase } from "@/lib/supabase"; // Importamos Supabase
 
-// --- MOCK DATA ACTUALIZADO ---
+// --- MOCK DATA ---
 type OrderStatus = "NUEVO" | "PREPARANDO" | "LISTO";
 type StaffOrder = {
   id: string;
   tableId: string;
   time: string;
   status: OrderStatus;
-  items: { name: string; qty: number; price: number; imageUrl: string }[];
+  items: { name: string; qty: number; price: number; imageUrl?: string }[];
   total: number;
   tip: number;
   comment?: string;
@@ -33,24 +34,6 @@ const initialOrders: StaffOrder[] = [
       { name: "Coca Cola", qty: 1, price: 2.50, imageUrl: "/mock-beer.png" }
     ],
     total: 5.90, tip: 0,
-  },
-  {
-    id: "3455", tableId: "08", time: "12:43", status: "PREPARANDO",
-    items: [
-      { name: "Caña", qty: 2, price: 1.90, imageUrl: "/mock-beer.png" },
-      { name: "Agua", qty: 1, price: 2.00, imageUrl: "/aperitivos.png" }
-    ],
-    total: 5.80, tip: 0,
-  },
-  {
-    id: "3454", tableId: "03", time: "12:41", status: "LISTO",
-    items: [{ name: "Aperol Spritz", qty: 1, price: 6.50, imageUrl: "/aperitivos.png" }],
-    total: 6.50, tip: 0,
-  },
-  {
-    id: "3453", tableId: "01", time: "12:40", status: "LISTO",
-    items: [{ name: "Cerveza Doble", qty: 1, price: 3.40, imageUrl: "/mock-beer.png" }],
-    total: 3.40, tip: 0,
   }
 ];
 
@@ -60,6 +43,54 @@ export function StaffPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("pedidos");
   const [orders, setOrders] = useState<StaffOrder[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<StaffOrder | null>(null);
+
+  // ==========================================
+  // MAGIA EN TIEMPO REAL (EFECTO WOW)
+  // ==========================================
+  useEffect(() => {
+    const channel = supabase
+      .channel('realtime-orders')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'orders' },
+        (payload) => {
+          const dbOrder = payload.new;
+
+          // Extraemos la hora para la tarjeta
+          const date = new Date(dbOrder.created_at);
+          const timeString = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+          // Formateamos los datos crudos de Supabase a nuestra interfaz visual
+          const incomingOrder: StaffOrder = {
+            id: String(dbOrder.order_number).padStart(4, "0"),
+            tableId: dbOrder.table_id,
+            time: timeString,
+            status: "NUEVO",
+            items: dbOrder.items,
+            total: Number(dbOrder.total),
+            tip: Number(dbOrder.tip),
+            comment: dbOrder.comment
+          };
+
+          // Reproducir sonido de campanita (puede requerir que el usuario haya hecho clic antes en la página)
+          try {
+            const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+            audio.play();
+          } catch (e) {
+            console.log("Audio autoplay bloqueado por el navegador");
+          }
+
+          // Agregamos la orden nueva al PRINCIPIO de la lista
+          setOrders((currentOrders) => [incomingOrder, ...currentOrders]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+  // ==========================================
 
   const handlePrint = () => window.print();
 
@@ -94,12 +125,9 @@ export function StaffPanel() {
     <>
       <div className="flex flex-col h-screen bg-[#0f1115] text-white print:hidden font-sans w-full max-w-[1800px] mx-auto relative">
 
-        {/* =========================================
-            PANTALLA 1: PEDIDOS EN CURSO
-            ========================================= */}
+        {/* PANTALLA 1: PEDIDOS EN CURSO */}
         {activeTab === "pedidos" && (
           <div className="flex-1 flex flex-col overflow-hidden fade-in">
-            {/* Header Adaptable */}
             <header className="flex items-center justify-between px-6 md:px-12 pt-8 md:pt-16 pb-6 md:pb-12">
               <div className="flex items-center gap-4 md:gap-6">
                 <button className="text-white/60 hover:text-white transition">
@@ -121,7 +149,7 @@ export function StaffPanel() {
                     key={order.id}
                     onClick={() => setSelectedOrder(order)}
                     className={`relative flex flex-col md:flex-row md:items-center justify-between bg-[#181b22] rounded-2xl md:rounded-3xl p-4 md:p-6 cursor-pointer transition active:scale-[0.99] hover:bg-[#1c2028] border gap-4 md:gap-0 ${isLatest
-                        ? "border-accent/40 md:shadow-[0_0_30px_rgba(245,197,66,0.08)]"
+                        ? "border-accent/40 md:shadow-[0_0_30px_rgba(245,197,66,0.08)] animate-in fade-in slide-in-from-top-4"
                         : "border-white/5"
                       }`}
                   >
@@ -149,7 +177,6 @@ export function StaffPanel() {
                       </div>
                     </div>
 
-                    {/* Botón y hora se adaptan: en móvil se separan, en PC se alinean */}
                     <div className="flex items-center justify-between md:justify-end gap-4 md:gap-12 shrink-0">
                       <span className="text-sm md:text-2xl text-white/40 font-mono pl-1 md:pl-0">{order.time}</span>
                       <button
@@ -166,9 +193,7 @@ export function StaffPanel() {
           </div>
         )}
 
-        {/* =========================================
-            PANTALLA 3: RESUMEN DEL DÍA
-            ========================================= */}
+        {/* PANTALLA 3: RESUMEN DEL DÍA */}
         {activeTab === "historial" && (
           <div className="flex-1 overflow-y-auto px-6 md:px-12 pt-8 md:pt-16 pb-32 md:pb-40 fade-in">
             <h1 className="text-base md:text-2xl font-black tracking-[0.2em] uppercase text-white/90 mb-6 md:mb-12">Resumen del día</h1>
@@ -176,7 +201,7 @@ export function StaffPanel() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-6 md:mb-12">
               <div className="bg-[#181b22] rounded-2xl md:rounded-[2rem] p-5 md:p-8 border border-white/5">
                 <p className="text-xs md:text-lg text-white/50 mb-2 md:mb-3 font-semibold">Pedidos</p>
-                <p className="text-2xl md:text-[3rem] leading-none font-black">128</p>
+                <p className="text-2xl md:text-[3rem] leading-none font-black">{orders.length + 126}</p>
               </div>
               <div className="bg-[#181b22] rounded-2xl md:rounded-[2rem] p-5 md:p-8 border border-white/5">
                 <p className="text-xs md:text-lg text-white/50 mb-2 md:mb-3 font-semibold flex items-center gap-1 md:gap-2">
@@ -244,9 +269,7 @@ export function StaffPanel() {
           </div>
         )}
 
-        {/* =========================================
-            BARRA DE NAVEGACIÓN INFERIOR Adaptable
-            ========================================= */}
+        {/* BARRA DE NAVEGACIÓN INFERIOR */}
         <nav className="absolute bottom-0 w-full bg-[#0a0c10]/95 backdrop-blur-md border-t border-white/5 flex justify-around items-center h-20 md:h-32 z-40 px-4 md:px-12">
           <button onClick={() => setActiveTab("pedidos")} className={`flex flex-col items-center gap-1 md:gap-3 ${activeTab === "pedidos" ? "text-accent" : "text-white/40 hover:text-white/70 transition"}`}>
             <svg className="w-6 h-6 md:w-9 md:h-9" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
@@ -266,9 +289,7 @@ export function StaffPanel() {
           </button>
         </nav>
 
-        {/* =========================================
-            PANTALLA 2: DETALLE DEL PEDIDO (MODAL)
-            ========================================= */}
+        {/* DETALLE DEL PEDIDO (MODAL) */}
         {selectedOrder && (
           <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8 fade-in">
             <div className="bg-[#181b22] border border-white/10 rounded-[2rem] md:rounded-[3rem] w-full max-w-sm md:max-w-2xl overflow-hidden flex flex-col shadow-2xl relative">
@@ -293,7 +314,7 @@ export function StaffPanel() {
                 </div>
               </div>
 
-              <div className="p-6 md:p-10 flex-1 space-y-4 md:space-y-8 overflow-y-auto">
+              <div className="p-6 md:p-10 flex-1 space-y-4 md:space-y-8 overflow-y-auto max-h-[40vh]">
                 {selectedOrder.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center">
                     <div className="flex items-center gap-3 md:gap-6">
@@ -340,10 +361,9 @@ export function StaffPanel() {
         )}
       </div>
 
-      {/* PLANTILLA DE IMPRESIÓN DEL TICKET (Queda igual, es nativa de hardware) */}
+      {/* PLANTILLA DE IMPRESIÓN DEL TICKET (Queda igual) */}
       {selectedOrder && (
         <div className="hidden print:block text-black bg-white w-[80mm] p-4 font-mono text-sm mx-auto">
-          {/* ... (Todo el contenido de impresión se mantiene idéntico) ... */}
           <div className="text-center mb-4">
             <h2 className="text-xl font-black uppercase">MERCADO DEL PRADO</h2>
             <p className="text-xs mt-1">Ticket de Comanda</p>
