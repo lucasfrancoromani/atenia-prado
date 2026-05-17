@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/menu";
 import { supabase } from "@/lib/supabase";
@@ -46,13 +46,6 @@ export function StaffPanel() {
   // Estado para el botón visual de "Alertas On"
   const [soundUnlocked, setSoundUnlocked] = useState(false);
 
-  // Instanciamos el audio de forma persistente
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    audioRef.current = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-  }, []);
-
   // MAGIA EN TIEMPO REAL
   useEffect(() => {
     const channel = supabase
@@ -76,10 +69,11 @@ export function StaffPanel() {
             comment: dbOrder.comment
           };
 
-          // Intento de reproducir sonido usando el ref persistente
-          if (audioRef.current) {
-            audioRef.current.currentTime = 0; // Reiniciar por si ya estaba sonando
-            audioRef.current.play().catch((error) => {
+          // Intento de reproducir sonido usando el elemento <audio> del DOM
+          const audioEl = document.getElementById("alert-audio") as HTMLAudioElement;
+          if (audioEl) {
+            audioEl.currentTime = 0; // Reiniciar por si ya estaba sonando
+            audioEl.play().catch((error) => {
               console.warn("🔔 Sonido silenciado: El navegador bloqueó el autoplay. El camarero debe interactuar con la pantalla primero.");
             });
           }
@@ -97,10 +91,11 @@ export function StaffPanel() {
   // Función para desbloquear el audio manualmente (Bypass de políticas de navegador)
   const unlockAudio = () => {
     setSoundUnlocked(true);
-    if (audioRef.current) {
-      audioRef.current.play().then(() => {
-        audioRef.current?.pause();
-        audioRef.current!.currentTime = 0;
+    const audioEl = document.getElementById("alert-audio") as HTMLAudioElement;
+    if (audioEl) {
+      audioEl.play().then(() => {
+        audioEl.pause();
+        audioEl.currentTime = 0;
       }).catch(e => console.log("Unlock failed", e));
     }
   };
@@ -136,6 +131,8 @@ export function StaffPanel() {
 
   return (
     <>
+      <audio id="alert-audio" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto" />
+
       {/* Estilos inyectados para el resplandor de alerta visual */}
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -162,15 +159,6 @@ export function StaffPanel() {
               </div>
               
               <div className="flex items-center gap-4">
-                {/* BOTÓN PARA DESBLOQUEAR AUDIO */}
-                <button
-                  onClick={unlockAudio}
-                  className={`hidden md:flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition ${soundUnlocked ? 'bg-success/10 border-success/30 text-success' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
-                >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                  {soundUnlocked ? 'Alertas On' : 'Activar Alertas'}
-                </button>
-
                 <div className="text-xs md:text-lg font-semibold text-white/50 flex items-center gap-2 md:gap-3 border border-white/10 rounded-xl px-4 py-2 md:py-3 cursor-pointer hover:bg-white/5 transition">
                   Todos <span className="text-[10px] md:text-sm">▼</span>
                 </div>
@@ -319,9 +307,36 @@ export function StaffPanel() {
           </div>
         )}
 
-        {(activeTab === "productos" || activeTab === "ajustes") && (
+        {activeTab === "productos" && (
           <div className="flex-1 grid place-items-center text-white/40 uppercase tracking-widest text-lg md:text-3xl font-bold fade-in">
             Próximamente: {activeTab}
+          </div>
+        )}
+
+        {activeTab === "ajustes" && (
+          <div className="flex-1 p-6 md:p-12 overflow-y-auto fade-in">
+             <h1 className="text-base md:text-2xl font-black tracking-[0.2em] uppercase text-white/90 mb-6 md:mb-12">Ajustes del Sistema</h1>
+             
+             <div className="bg-[#181b22] border border-white/5 rounded-2xl p-6 md:p-10 max-w-2xl">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="grid size-12 place-items-center rounded-xl bg-accent/10 text-accent">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Alertas Sonoras</h2>
+                </div>
+                
+                <p className="text-sm md:text-base text-white/60 mb-8 leading-relaxed">
+                  Debido a las políticas de seguridad de los navegadores (como Safari o Chrome), las alertas de sonido para los nuevos pedidos no pueden sonar automáticamente hasta que el usuario (tú) dé permiso interactuando explícitamente con la aplicación al menos una vez.
+                </p>
+                
+                <button
+                  onClick={unlockAudio}
+                  className={`w-full md:w-auto flex justify-center items-center gap-3 px-8 py-4 rounded-xl border text-base font-bold transition active:scale-[0.98] ${soundUnlocked ? 'bg-success/10 border-success/30 text-success' : 'bg-accent border-accent text-black hover:brightness-110 shadow-[0_10px_30px_rgba(245,197,66,0.15)]'}`}
+                >
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                  {soundUnlocked ? 'Alertas Activadas Correctamente' : 'Activar Alertas de Audio'}
+                </button>
+             </div>
           </div>
         )}
 

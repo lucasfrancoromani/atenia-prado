@@ -9,6 +9,8 @@ type OrderConfirmationProps = {
 export function OrderConfirmation({ order, onReset }: OrderConfirmationProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/60 backdrop-blur-md fade-in">
+      {/* Sonido de éxito al pagar (se reproduce automático porque el usuario acaba de hacer click en Pagar) */}
+      <audio autoPlay src="https://www.soundjay.com/misc/sounds/magic-chime-01.mp3" />
 
       <section className="premium-panel relative z-10 w-full max-h-[90vh] overflow-y-auto rounded-t-[2.5rem] p-6 pb-10 animate-slide-up text-center">
         <div className="mx-auto mb-8 h-1.5 w-12 rounded-full bg-white/20" />
