@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/menu";
 import { supabase } from "@/lib/supabase";
@@ -42,6 +42,16 @@ export function StaffPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("pedidos");
   const [orders, setOrders] = useState<StaffOrder[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<StaffOrder | null>(null);
+  
+  // Estado para el botón visual de "Alertas On"
+  const [soundUnlocked, setSoundUnlocked] = useState(false);
+
+  // Instanciamos el audio de forma persistente
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+  }, []);
 
   // MAGIA EN TIEMPO REAL
   useEffect(() => {
@@ -66,12 +76,13 @@ export function StaffPanel() {
             comment: dbOrder.comment
           };
 
-          // Intento de reproducir sonido (funcionará si el usuario ya hizo clic en la página)
-          // Reproducir sonido manejando la promesa del Autoplay
-          const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-          audio.play().catch((error) => {
-            console.warn("🔔 Sonido silenciado: El camarero debe hacer al menos un clic en la pantalla para activar las alertas sonoras.");
-          });
+          // Intento de reproducir sonido usando el ref persistente
+          if (audioRef.current) {
+            audioRef.current.currentTime = 0; // Reiniciar por si ya estaba sonando
+            audioRef.current.play().catch((error) => {
+              console.warn("🔔 Sonido silenciado: El navegador bloqueó el autoplay. El camarero debe interactuar con la pantalla primero.");
+            });
+          }
 
           setOrders((currentOrders) => [incomingOrder, ...currentOrders]);
         }
@@ -82,6 +93,17 @@ export function StaffPanel() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Función para desbloquear el audio manualmente (Bypass de políticas de navegador)
+  const unlockAudio = () => {
+    setSoundUnlocked(true);
+    if (audioRef.current) {
+      audioRef.current.play().then(() => {
+        audioRef.current?.pause();
+        audioRef.current!.currentTime = 0;
+      }).catch(e => console.log("Unlock failed", e));
+    }
+  };
 
   const handlePrint = () => window.print();
 
@@ -138,8 +160,20 @@ export function StaffPanel() {
                 </button>
                 <h1 className="text-base md:text-2xl font-black tracking-[0.2em] uppercase text-white/90">Pedidos en curso</h1>
               </div>
-              <div className="text-xs md:text-lg font-semibold text-white/50 flex items-center gap-2 md:gap-3 border border-white/10 rounded-xl px-4 py-2 md:py-3 cursor-pointer hover:bg-white/5 transition">
-                Todos <span className="text-[10px] md:text-sm">▼</span>
+              
+              <div className="flex items-center gap-4">
+                {/* BOTÓN PARA DESBLOQUEAR AUDIO */}
+                <button
+                  onClick={unlockAudio}
+                  className={`hidden md:flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition ${soundUnlocked ? 'bg-success/10 border-success/30 text-success' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
+                >
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                  {soundUnlocked ? 'Alertas On' : 'Activar Alertas'}
+                </button>
+
+                <div className="text-xs md:text-lg font-semibold text-white/50 flex items-center gap-2 md:gap-3 border border-white/10 rounded-xl px-4 py-2 md:py-3 cursor-pointer hover:bg-white/5 transition">
+                  Todos <span className="text-[10px] md:text-sm">▼</span>
+                </div>
               </div>
             </header>
 
