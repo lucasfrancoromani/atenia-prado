@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/menu";
-import { supabase } from "@/lib/supabase"; // Importamos Supabase
+import { supabase } from "@/lib/supabase";
 
-// --- MOCK DATA ---
 type OrderStatus = "NUEVO" | "PREPARANDO" | "LISTO";
 type StaffOrder = {
   id: string;
@@ -44,9 +43,7 @@ export function StaffPanel() {
   const [orders, setOrders] = useState<StaffOrder[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<StaffOrder | null>(null);
 
-  // ==========================================
-  // MAGIA EN TIEMPO REAL (EFECTO WOW)
-  // ==========================================
+  // MAGIA EN TIEMPO REAL
   useEffect(() => {
     const channel = supabase
       .channel('realtime-orders')
@@ -55,12 +52,9 @@ export function StaffPanel() {
         { event: 'INSERT', schema: 'public', table: 'orders' },
         (payload) => {
           const dbOrder = payload.new;
-
-          // Extraemos la hora para la tarjeta
           const date = new Date(dbOrder.created_at);
           const timeString = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
 
-          // Formateamos los datos crudos de Supabase a nuestra interfaz visual
           const incomingOrder: StaffOrder = {
             id: String(dbOrder.order_number).padStart(4, "0"),
             tableId: dbOrder.table_id,
@@ -72,15 +66,14 @@ export function StaffPanel() {
             comment: dbOrder.comment
           };
 
-          // Reproducir sonido de campanita (puede requerir que el usuario haya hecho clic antes en la página)
+          // Intento de reproducir sonido (funcionará si el usuario ya hizo clic en la página)
           try {
             const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
             audio.play();
           } catch (e) {
-            console.log("Audio autoplay bloqueado por el navegador");
+            console.log("Audio bloqueado por navegador. Requiere interacción previa.");
           }
 
-          // Agregamos la orden nueva al PRINCIPIO de la lista
           setOrders((currentOrders) => [incomingOrder, ...currentOrders]);
         }
       )
@@ -90,7 +83,6 @@ export function StaffPanel() {
       supabase.removeChannel(channel);
     };
   }, []);
-  // ==========================================
 
   const handlePrint = () => window.print();
 
@@ -123,6 +115,18 @@ export function StaffPanel() {
 
   return (
     <>
+      {/* Estilos inyectados para el resplandor de alerta visual */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @keyframes alert-glow {
+          0%, 100% { box-shadow: 0 0 15px rgba(245, 197, 66, 0.1); border-color: rgba(245, 197, 66, 0.3); }
+          50% { box-shadow: 0 0 45px rgba(245, 197, 66, 0.6); border-color: rgba(245, 197, 66, 0.9); }
+        }
+        .animate-alert-glow {
+          animation: alert-glow 1.5s ease-in-out infinite;
+        }
+      `}} />
+
       <div className="flex flex-col h-screen bg-[#0f1115] text-white print:hidden font-sans w-full max-w-[1800px] mx-auto relative">
 
         {/* PANTALLA 1: PEDIDOS EN CURSO */}
@@ -148,13 +152,23 @@ export function StaffPanel() {
                   <div
                     key={order.id}
                     onClick={() => setSelectedOrder(order)}
+                    // Aquí aplicamos la clase animate-alert-glow si es la comanda nueva
                     className={`relative flex flex-col md:flex-row md:items-center justify-between bg-[#181b22] rounded-2xl md:rounded-3xl p-4 md:p-6 cursor-pointer transition active:scale-[0.99] hover:bg-[#1c2028] border gap-4 md:gap-0 ${isLatest
-                        ? "border-accent/40 md:shadow-[0_0_30px_rgba(245,197,66,0.08)] animate-in fade-in slide-in-from-top-4"
+                        ? "animate-alert-glow animate-in fade-in slide-in-from-top-4"
                         : "border-white/5"
                       }`}
                   >
+                    {/* El detalle de la línea superior resaltada */}
                     {isLatest && (
                       <div className="absolute -top-[1px] left-6 md:left-8 w-16 md:w-32 h-[2px] md:h-[3px] bg-accent rounded-b-sm" />
+                    )}
+
+                    {/* BALIZA LUMINOSA RADAR (Ping) */}
+                    {isLatest && (
+                      <span className="absolute -top-2 -right-2 md:-top-3 md:-right-3 flex h-6 w-6 md:h-8 md:w-8">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-6 w-6 md:h-8 md:w-8 bg-accent border-4 border-[#0f1115]"></span>
+                      </span>
                     )}
 
                     <div className="flex items-center gap-4 md:gap-8 flex-1 min-w-0">
@@ -361,7 +375,7 @@ export function StaffPanel() {
         )}
       </div>
 
-      {/* PLANTILLA DE IMPRESIÓN DEL TICKET (Queda igual) */}
+      {/* PLANTILLA DE IMPRESIÓN DEL TICKET */}
       {selectedOrder && (
         <div className="hidden print:block text-black bg-white w-[80mm] p-4 font-mono text-sm mx-auto">
           <div className="text-center mb-4">
